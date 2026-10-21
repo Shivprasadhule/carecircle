@@ -1,0 +1,17 @@
+{
+  "intro":   {"cap": "CareCircle: voice-first care for the people we love", "say": "Millions of families look after an older parent from far away. CareCircle gives that parent a voice assistant, and gives the family a calm, trustworthy picture."},
+  "start":   {"cap": "Six synthetic families, 29 accounts, four roles. Start the demo.", "say": "Six synthetic families, twenty nine accounts, four roles. Let's start the demo."},
+  "asha":    {"cap": "Asha, 78, has type 2 diabetes. She just talks to Alexa.", "say": "Asha is seventy eight, and has type two diabetes. She simply talks to Alexa."},
+  "tools":   {"cap": "Alexa picks the tools: log the dose, record the reading, check the trend", "say": "Alexa chooses the tools. It logs the dose, records the sugar reading, and checks the trend."},
+  "mcp":     {"cap": "Every call goes through the MCP server: permission-checked, patient-bound, audited", "say": "Every call goes through our M C P server. Each one is permission checked, bound to this one patient, and audited."},
+  "family":  {"cap": "Her son Rohan sees it instantly in the family app", "say": "Her son Rohan sees it instantly, in the family app."},
+  "safety":  {"cap": "Safety is code, not luck: emergencies are never left to the model", "say": "Safety is code, not luck. Emergencies are never left to the model."},
+  "fall":    {"cap": "The server speaks a fixed 112 / 108 message and raises an urgent alert", "say": "The server speaks a fixed one one two, one zero eight message, and raises an urgent alert. It never claims that help is on the way."},
+  "watch":   {"cap": "Autonomous care watch: reviews the whole record and decides who needs to know", "say": "The autonomous care watch reviews the whole record, and decides who needs to know."},
+  "langs":   {"cap": "Seven languages. Alexa+ in India covers English, Hindi and Hinglish today.", "say": "Seven languages. Alexa plus in India covers English, Hindi and Hinglish today."},
+  "admin":   {"cap": "Family admins manage the care plan. New prescription? Just photograph it.", "say": "Family admins manage the care plan. A new prescription? Just photograph it."},
+  "scan":    {"cap": "The model reads it into a draft. Nothing is added until a person confirms.", "say": "The model reads it into a draft. Nothing is added until a person confirms."},
+  "checks":  {"cap": "Allergy conflicts and duplicates are caught by code, not by the model", "say": "Code, not the model, checks for allergy conflicts and duplicates."},
+  "audit":   {"cap": "Every action is audited. Families only ever see their own people.", "say": "Every action is audited, and families only ever see their own people."},
+  "outro":   {"cap": "CareCircle · built for Alexa+ with an MCP server · MIT · github.com/Shivprasadhule/carecircle", "say": "CareCircle. Built for Alexa plus on an M C P server. Open source, M I T, on Git Hub."}
+}

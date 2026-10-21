@@ -1,11 +1,13 @@
-# Demo video script (target: under 3 minutes; the recorded run is 1:53)
+# Demo video script (target: under 3 minutes; the recorded run is 2:01)
 
-The video is recorded by `web/demo/record.mjs`, which drives the real UI against the running server with on-screen captions.
-It is silent; the narration below is meant to be read over it (or removed, since the captions carry the story).
+The video is recorded by `web/demo/record.mjs`, which drives the real UI against the running server with on-screen captions and a spoken voiceover (`web/demo/make_audio.py`, macOS voice "Tara", English India). Each caption waits for its spoken line, so the voice never overlaps.
+The narration below is the spoken text; the exact lines live in `web/demo/narration.json`.
 
 ```bash
 CARECIRCLE_DEMO_TIME=09:00 uv run carecircle        # needs the model key in .env
-cd web && node demo/record.mjs                       # -> web/demo/out/carecircle-demo.webm
+cd web && python3 demo/make_audio.py clips           # speak the lines (macOS `say`)
+node demo/record.mjs                                 # -> out/carecircle-silent.webm + timeline.json
+python3 demo/make_audio.py mix /path/to/ffmpeg       # -> out/carecircle-demo.mp4 (needs a full ffmpeg with H.264 and AAC)
 ```
 
 | Time | On screen | Narration |
@@ -31,5 +33,5 @@ cd web && node demo/record.mjs                       # -> web/demo/out/carecircl
 
 ## Uploading (Devpost needs a public link)
 
-Upload `web/demo/out/carecircle-demo.webm` to YouTube or Vimeo, set it to public or unlisted, and paste the link into Devpost.
+Upload `web/demo/out/carecircle-demo.mp4` to YouTube or Vimeo, set it to public or unlisted, and paste the link into Devpost.
 The video file is git-ignored (about 27 MB).
