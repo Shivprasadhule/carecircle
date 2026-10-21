@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CareCircle</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%2300a5d9' stroke-width='4'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23ff8a5b'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f4f1ec; --panel:#ffffff; --ink:#18212f; --muted:#667085; --line:#e6e1d8;
+  --brand:#0b6e8f; --brand-2:#00a5d9; --warm:#ff8a5b; --ok:#2e9d6a; --watch:#d99a1c; --high:#e2603b; --urgent:#c4252f;
+  --dev:#0b1220; --dev-2:#111c33; --radius:18px; --shadow:0 1px 2px rgba(24,33,47,.06),0 8px 28px rgba(24,33,47,.07);
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#0e131c;--panel:#161d2a;--ink:#e8edf5;--muted:#93a0b4;--line:#243044;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 28px rgba(0,0,0,.35)}
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 "Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 56px}
+header{display:flex;align-items:center;gap:16px;padding:18px 0;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;letter-spacing:-.02em}
+.logo svg{width:30px;height:30px}
+.tabs{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px;margin-left:auto;box-shadow:var(--shadow)}
+.tab{border:0;background:none;color:var(--muted);padding:8px 18px;border-radius:999px;font-weight:600}
+.tab[aria-selected=true]{background:var(--brand);color:#fff}
+.pill{font-size:12px;border:1px solid var(--line);padding:4px 10px;border-radius:999px;color:var(--muted);background:var(--panel)}
+.pill b{color:var(--ink)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px}
+.dot.bad{background:var(--urgent)}
+h1,h2,h3{margin:0;letter-spacing:-.02em}
+h2{font-size:15px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.grid{display:grid;gap:18px}
+.view{display:none}.view.on{display:block}
+
+/* ---------- Alexa device ---------- */
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start}
+.device{background:linear-gradient(160deg,var(--dev-2),var(--dev));border-radius:34px;padding:14px;box-shadow:0 30px 60px rgba(8,14,30,.35),inset 0 0 0 2px #26324d;color:#e8f0ff}
+.screen{background:radial-gradient(1200px 500px at 20% -10%,#14305a 0%,transparent 60%),#0a1224;border-radius:22px;height:660px;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.screen-top{display:flex;align-items:center;gap:12px;padding:16px 20px 8px}
+.ring{width:38px;height:38px;border-radius:50%;border:4px solid var(--brand-2);box-shadow:0 0 18px rgba(0,202,255,.55);transition:.3s}
+.ring.think{animation:spin 1.1s linear infinite;border-color:#7be3ff transparent #00a5d9 transparent}
+.ring.talk{animation:pulse 1s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{50%{transform:scale(1.14);box-shadow:0 0 30px rgba(0,202,255,.9)}}
+.clock{margin-left:auto;font-size:13px;color:#8fa6c9}
+.greet{font-size:13px;color:#8fa6c9}
+.greet b{color:#e8f0ff;font-size:16px;display:block}
+.feed{flex:1;overflow:auto;padding:8px 20px 12px;scroll-behavior:smooth}
+.feed::-webkit-scrollbar{width:6px}.feed::-webkit-scrollbar-thumb{background:#27375a;border-radius:6px}
+.msg{max-width:86%;margin:10px 0;padding:11px 15px;border-radius:18px;font-size:16px;line-height:1.45;animation:in .25s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+.msg.user{margin-left:auto;background:#1c4fd6;border-bottom-right-radius:6px}
+.msg.bot{background:#16223d;border:1px solid #223357;border-bottom-left-radius:6px}
+.msg.err{background:#3a1620;border:1px solid #6e2535;color:#ffc9d1;font-size:14px}
+.typing{display:inline-flex;gap:4px}.typing i{width:7px;height:7px;border-radius:50%;background:#7aa2e8;animation:b 1s infinite}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes b{50%{transform:translateY(-5px);opacity:.5}}
+.cards{display:flex;gap:10px;overflow-x:auto;padding:2px 0 6px;margin:4px 0 8px}
+.tc{min-width:220px;max-width:260px;background:linear-gradient(180deg,#14213d,#101a30);border:1px solid #243457;border-radius:16px;padding:13px 14px;font-size:13px;color:#cfdcf5;animation:in .3s ease}
+.tc .k{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#7f98c4;display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.tc .t{font-size:16px;font-weight:650;color:#fff}
+.tc .s{color:#9fb3d9;margin-top:2px}
+.chip{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:#1d3a2f;color:#6fe0a8}
+.chip.missed,.chip.overdue,.chip.high,.chip.urgent{background:#43202a;color:#ff9fae}
+.chip.watch,.chip.due,.chip.skipped{background:#4a3b14;color:#ffd277}
+.chip.upcoming,.chip.info,.chip.ok{background:#1d2d4f;color:#9bbcff}
+.bars{display:flex;gap:3px;align-items:flex-end;height:30px;margin-top:8px}
+.bars i{flex:1;background:#2c4d86;border-radius:3px;min-height:3px}
+.bars i.hot{background:#ff8a5b}
+.composer{padding:12px 16px 16px;border-top:1px solid #1b2a49;background:#0b1429}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px}
+.chips button{white-space:nowrap;background:#12203d;border:1px solid #27406c;color:#c6d8ff;border-radius:999px;padding:6px 13px;font-size:13px}
+.chips button:hover{background:#18305b}
+.row{display:flex;gap:10px;align-items:center}
+.row input{flex:1;background:#0f1a33;border:1px solid #27406c;color:#fff;border-radius:999px;padding:12px 18px;font-size:15px;outline:none}
+.row input:focus{border-color:var(--brand-2)}
+.round{width:46px;height:46px;border-radius:50%;border:0;background:var(--brand-2);color:#00131d;display:grid;place-items:center;flex:none}
+.round.rec{background:#ff5d73;color:#fff;animation:pulse 1s infinite}
+.round.send{background:#1c4fd6;color:#fff}
+.round svg{width:22px;height:22px}
+.side .card{margin-bottom:16px}
+.side p{margin:6px 0;color:var(--muted);font-size:14px}
+.toggle{display:flex;align-items:center;gap:10px;font-size:14px;margin-top:10px}
+.toggle input{width:18px;height:18px;accent-color:var(--brand)}
+.mcp-log{font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;max-height:230px;overflow:auto;background:#0b1220;color:#9fe3c0;border-radius:12px;padding:10px 12px}
+.mcp-log div{margin-bottom:6px;white-space:pre-wrap;word-break:break-word}
+.mcp-log .in{color:#8ec1ff}
+
+/* ---------- Dashboard ---------- */
+.hero{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}
+.who{display:flex;gap:16px;align-items:center}
+.avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--warm),#ffb37a);display:grid;place-items:center;font-size:26px;font-weight:700;color:#fff}
+.who h1{font-size:26px}
+.who .sub{color:var(--muted);font-size:14px}
+.level{display:flex;align-items:center;gap:12px}
+.badge{padding:6px 14px;border-radius:999px;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+.badge.ok{background:#e0f4ea;color:#1c7a50}.badge.watch{background:#fbf0d3;color:#8a6208}.badge.high{background:#fde3da;color:#a9401f}.badge.urgent{background:#fbd5d8;color:#8f1520}
+@media (prefers-color-scheme: dark){.badge.ok{background:#173a2b;color:#74e3ad}.badge.watch{background:#43361a;color:#ffd277}.badge.high{background:#47241a;color:#ffa88a}.badge.urgent{background:#4a1a1f;color:#ff9fa8}}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:12px;padding:10px 16px;font-weight:600}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn:disabled{opacity:.55;cursor:wait}
+.btn.small{padding:5px 11px;font-size:13px;border-radius:9px}
+.cols{column-count:3;column-gap:18px;margin-top:18px}
+.cols>.card{break-inside:avoid;margin-bottom:18px;display:inline-block;width:100%}
+.span2{}
+.dose{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.dose:last-child{border:0}
+.time{font-variant-numeric:tabular-nums;font-weight:700;width:52px}
+.dose .nm{flex:1}.dose .nm small{display:block;color:var(--muted)}
+.st{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px}
+.st.taken{background:#e0f4ea;color:#1c7a50}.st.missed,.st.overdue{background:#fde3da;color:#a9401f}.st.due{background:#fbf0d3;color:#8a6208}.st.upcoming,.st.skipped{background:#e9eef6;color:#51607a}
+@media (prefers-color-scheme: dark){.st.taken{background:#173a2b;color:#74e3ad}.st.missed,.st.overdue{background:#47241a;color:#ffa88a}.st.due{background:#43361a;color:#ffd277}.st.upcoming,.st.skipped{background:#222c40;color:#a9b6cc}}
+.sig{padding:12px 14px;border-radius:12px;border:1px solid var(--line);margin-bottom:10px;display:flex;gap:12px}
+.sig .bar{width:4px;border-radius:4px;background:var(--watch);flex:none}
+.sig.high .bar{background:var(--high)}.sig.urgent .bar{background:var(--urgent)}
+.sig b{display:block;text-transform:capitalize}
+.sig span{color:var(--muted);font-size:14px}
+.alert{padding:13px 14px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px}
+.alert .h{display:flex;gap:8px;align-items:center;margin-bottom:4px}
+.alert .h b{flex:1}
+.alert small{color:var(--muted);display:block;margin-top:4px}
+.empty{color:var(--muted);padding:10px 0}
+.chart{width:100%;height:190px}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+.appt{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.appt:last-child{border:0}
+.date{width:50px;text-align:center;border-radius:12px;background:var(--bg);padding:6px 0;flex:none}
+.date b{display:block;font-size:20px;line-height:1}.date small{font-size:11px;text-transform:uppercase;color:var(--muted)}
+.ride{font-size:11px;font-weight:700;background:#fde3da;color:#a9401f;border-radius:999px;padding:2px 8px;margin-left:6px}
+.mem{font-size:14px;padding:8px 0;border-bottom:1px solid var(--line)}.mem:last-child{border:0}
+.digest{white-space:pre-wrap;font-size:14.5px;line-height:1.6;background:var(--bg);border-radius:12px;padding:14px;margin-top:12px}
+.fchat{margin-top:10px}.fchat .log{max-height:240px;overflow:auto;margin-bottom:10px}
+.fm{padding:8px 12px;border-radius:12px;margin:6px 0;font-size:14px;white-space:pre-wrap}
+.fm.u{background:var(--brand);color:#fff;margin-left:30px}.fm.b{background:var(--bg);margin-right:30px}
+.fchat form{display:flex;gap:8px}.fchat input{flex:1;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:12px;padding:10px 14px;font:inherit}
+footer{color:var(--muted);font-size:12px;text-align:center;margin-top:30px}
+footer a{color:inherit}
+@media(max-width:1100px){.cols{column-count:2}}
+@media(max-width:980px){.stage{grid-template-columns:1fr}.hero{grid-template-columns:1fr}.cols{column-count:1}.screen{height:78vh}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">
+      <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="none" stroke="#00a5d9" stroke-width="4"/><circle cx="16" cy="16" r="5" fill="#ff8a5b"/></svg>
+      CareCircle
+    </div>
+    <span class="pill" id="health"><span class="dot"></span>checking…</span>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-view="alexa">Alexa+ for Asha</button>
+      <button class="tab" role="tab" aria-selected="false" data-view="family">Family dashboard</button>
+    </div>
+  </header>
+
+  <!-- ===================== ALEXA VIEW ===================== -->
+  <section class="view on" id="v-alexa">
+    <div class="stage">
+      <div class="device"><div class="screen">
+        <div class="screen-top">
+          <div class="ring" id="ring"></div>
+          <div class="greet"><span id="part">Good morning</span><b>Asha tai</b></div>
+          <div class="clock" id="clock"></div>
+        </div>
+        <div class="feed" id="feed"></div>
+        <div class="composer">
+          <div class="chips" id="chips"></div>
+          <form class="row" id="form">
+            <button type="button" class="round" id="mic" title="Speak" aria-label="Speak">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+            </button>
+            <input id="input" placeholder="Say or type something to Alexa…" autocomplete="off">
+            <button class="round send" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          </form>
+        </div>
+      </div></div>
+
+      <aside class="side">
+        <div class="card">
+          <h2>How this works</h2>
+          <p>This simulates the <b>Alexa+</b> experience. Every reply is produced by Claude on Amazon Bedrock, calling the <b>CareCircle MCP server</b> over Streamable HTTP.</p>
+          <label class="toggle"><input type="checkbox" id="speak" checked> Speak replies aloud</label>
+        </div>
+        <div class="card">
+          <h2>Live MCP traffic</h2>
+          <div class="mcp-log" id="mcplog"><div>waiting for the first request…</div></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===================== FAMILY VIEW ===================== -->
+  <section class="view" id="v-family">
+    <div class="hero">
+      <div class="card">
+        <div class="who">
+          <div class="avatar" id="av">A</div>
+          <div>
+            <h1 id="pname">Asha Deshmukh</h1>
+            <div class="sub" id="pinfo"></div>
+            <div class="level" style="margin-top:10px"><span class="badge ok" id="lvl">ok</span><span class="sub" id="lvltext"></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Autonomous care watch</h2>
+        <p class="sub" style="margin:0 0 12px;color:var(--muted)">Claude reviews the full record, decides whether the family needs to know, and raises alerts by itself.</p>
+        <div class="btns">
+          <button class="btn primary" id="watch">Run care watch</button>
+          <button class="btn" id="digest">Weekly digest</button>
+          <button class="btn small" id="reset" title="Reset demo data">Reset demo</button>
+        </div>
+      </div>
+    </div>
+    <div class="card" id="reportcard" style="display:none;margin-top:18px"><h2 id="reporttitle">Report</h2><div class="digest" id="report"></div><div class="cards" id="reportcards" style="margin-top:10px"></div></div>
+
+    <div class="cols">
+      <div class="card"><h2>Family alerts</h2><div id="alerts"></div></div>
+      <div class="card"><h2>Why Claude is concerned</h2><div id="signals"></div></div>
+      <div class="card span2">
+        <h2>Mood, sleep &amp; pain (last 7 days)</h2>
+        <svg class="chart" id="chart" viewBox="0 0 640 210" preserveAspectRatio="none"></svg>
+        <div class="legend"><span><i style="background:#0b6e8f"></i>Mood (1-5)</span><span><i style="background:#8a6fe0"></i>Sleep (h)</span><span><i style="background:#ff8a5b"></i>Pain (0-10)</span></div>
+      </div>
+      
+      <div class="card"><h2>Today's medicines</h2><div id="doses"></div></div>
+      <div class="card"><h2>Adherence by day</h2><svg class="chart" id="adh" viewBox="0 0 300 210" preserveAspectRatio="none"></svg><div class="legend" id="adhsum"></div></div>
+      
+      <div class="card"><h2>Upcoming</h2><div id="appts"></div></div>
+      <div class="card"><h2>What CareCircle remembers</h2><div id="mems"></div><h2 style="margin-top:16px">Family circle</h2><div id="cg"></div></div>
+      <div class="card">
+        <h2>Ask about Asha</h2>
+        <div class="fchat"><div class="log" id="flog"></div>
+          <form id="fform"><input id="fin" placeholder="e.g. How has she been this week?" autocomplete="off"><button class="btn primary">Ask</button></form>
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer>All data is synthetic. CareCircle does not give medical advice. · MCP endpoint: <code>/mcp/</code> · <a href="https://github.com" target="_blank" rel="noopener">Open source (MIT)</a></footer>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let sessionId = null, speaking = false, busy = false;
+const familySession = 'fam-' + Math.random().toString(36).slice(2, 8);
+
+/* ---------- tabs ---------- */
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x === t));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.id === 'v-' + t.dataset.view));
+  if (t.dataset.view === 'family') loadFamily();
+});
+
+/* ---------- helpers ---------- */
+async function api(path, body) {
+  const r = await fetch(path, body === undefined ? {} : {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || j.detail || r.statusText);
+  return j;
+}
+const fmtTime = iso => new Date(iso).toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
+const fmtDay = iso => new Date(iso).toLocaleDateString([], {weekday: 'short', day: 'numeric', month: 'short'});
+const ago = iso => { const m = Math.round((Date.now() - new Date(iso)) / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m/60) + ' h ago' : Math.round(m/1440) + ' d ago'; };
+const moodFace = m => ['', '😞', '😕', '😐', '🙂', '😄'][m] || '🙂';
+
+function tick() {
+  const d = new Date(); $('#clock').textContent = d.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
+  const h = d.getHours(); $('#part').textContent = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+}
+setInterval(tick, 20000); tick();
+
+async function loadHealth() {
+  try {
+    const h = await api('/api/health');
+    $('#health').innerHTML = `<span class="dot ${h.bedrock_key_configured ? '' : 'bad'}"></span>${h.bedrock_key_configured ? 'Bedrock ready' : 'Bedrock key missing'} · <b>${esc(h.region)}</b>`;
+  } catch { $('#health').innerHTML = '<span class="dot bad"></span>server offline'; }
+}
+
+/* ---------- speech ---------- */
+function speak(text) {
+  if (!$('#speak').checked || !('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text); u.rate = .96;
+  const v = speechSynthesis.getVoices().find(v => /en-(IN|US|GB)/.test(v.lang) && /female|Samantha|Veena|Google/i.test(v.name));
+  if (v) u.voice = v;
+  u.onstart = () => $('#ring').className = 'ring talk';
+  u.onend = () => $('#ring').className = 'ring';
+  speechSynthesis.speak(u);
+}
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null;
+$('#mic').onclick = () => {
+  if (!SR) { addMsg('err', 'Voice input is not supported in this browser. Try Chrome, or type instead.'); return; }
+  if (rec) { rec.stop(); return; }
+  rec = new SR(); rec.lang = 'en-IN'; rec.interimResults = true;
+  $('#mic').classList.add('rec');
+  rec.onresult = e => { $('#input').value = [...e.results].map(r => r[0].transcript).join(' '); if (e.results[e.results.length - 1].isFinal) { send($('#input').value); } };
+  rec.onend = () => { rec = null; $('#mic').classList.remove('rec'); };
+  rec.start();
+};
+
+/* ---------- alexa chat ---------- */
+const CHIPS = ['Good morning', 'I took my metformin', 'I slept badly last night', 'What is on today?', 'My knees hurt a lot', "I forgot my night tablets"];
+$('#chips').innerHTML = CHIPS.map(c => `<button type="button">${esc(c)}</button>`).join('');
+$('#chips').onclick = e => { if (e.target.tagName === 'BUTTON') send(e.target.textContent); };
+$('#form').onsubmit = e => { e.preventDefault(); send($('#input').value); };
+
+function addMsg(kind, text) {
+  const d = document.createElement('div'); d.className = 'msg ' + kind; d.textContent = text;
+  $('#feed').appendChild(d); $('#feed').scrollTop = 1e9; return d;
+}
+async function send(text) {
+  text = (text || '').trim(); if (!text || busy) return;
+  busy = true; $('#input').value = ''; speechSynthesis?.cancel();
+  addMsg('user', text);
+  const t = addMsg('bot', ''); t.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>';
+  $('#ring').className = 'ring think';
+  mcpLog('→ ' + text, true);
+  try {
+    const r = await api('/api/chat', {message: text, session_id: sessionId, role: 'person'});
+    sessionId = r.session_id;
+    t.remove();
+    (r.tool_events || []).forEach(ev => mcpLog(`tools/call ${ev.tool}(${JSON.stringify(ev.input)})`));
+    const cards = renderEvents(r.tool_events || []);
+    if (cards) $('#feed').appendChild(cards);
+    addMsg('bot', r.reply);
+    $('#ring').className = 'ring'; speak(r.reply);
+  } catch (e) {
+    t.remove(); addMsg('err', 'Something went wrong: ' + e.message); $('#ring').className = 'ring';
+  } finally { busy = false; $('#feed').scrollTop = 1e9; }
+}
+function mcpLog(line, inbound) {
+  const log = $('#mcplog'); if (log.firstChild?.textContent.startsWith('waiting')) log.innerHTML = '';
+  const d = document.createElement('div'); if (inbound) d.className = 'in'; d.textContent = line; log.appendChild(d); log.scrollTop = 1e9;
+}
+
+/* ---------- tool cards ---------- */
+function renderEvents(events) {
+  const html = [];
+  for (const ev of events) {
+    const r = ev.result || {}, i = ev.input || {};
+    if (ev.status === 'error') { html.push(card('Tool error', ev.tool, esc(JSON.stringify(r).slice(0, 120)))); continue; }
+    switch (ev.tool) {
+      case 'log_dose': if (r.ok) html.push(card('Medicine logged', `${esc(r.medication)} ${esc(r.dose || '')}`, `<span class="chip ${esc(r.status)}">${esc(r.status)}</span> · ${esc(r.slot || '')}${r.with_food ? ' · with food' : ''}`)); break;
+      case 'record_checkin': if (r.ok) html.push(card('Check-in saved', `${moodFace(r.mood)} Mood ${r.mood}/5`, `Pain ${r.pain}/10${r.sleep_hours != null ? ' · Sleep ' + r.sleep_hours + 'h' : ''}<br><span class="chip ${esc(r.signals?.level)}">${esc(r.signals?.level)}</span>`)); break;
+      case 'list_todays_doses': case 'get_care_snapshot': {
+        const doses = r.doses || r.doses_today || [];
+        if (doses.length) html.push(card('Today', `${doses.filter(d => d.status === 'taken').length}/${doses.length} doses taken`, doses.slice(0, 5).map(d => `${esc(d.medication)} ${esc(d.slot)} <span class="chip ${esc(d.status)}">${esc(d.status)}</span>`).join('<br>')));
+        (r.next_appointments || []).slice(0, 2).forEach(a => html.push(apptCard(a)));
+        break; }
+      case 'list_appointments': (r.appointments || []).forEach(a => html.push(apptCard(a))); break;
+      case 'schedule_appointment': if (r.ok) html.push(apptCard({title: r.title, starts_at: r.starts_at, location: r.location, needs_ride: r.needs_ride}, 'Booked')); break;
+      case 'raise_family_alert': { const a = r.alert; if (a) html.push(card('Family alerted', esc(a.title), `<span class="chip ${esc(a.severity)}">${esc(a.severity)}</span> · notified ${esc(a.notified || 'family')}`)); break; }
+      case 'analyze_wellbeing_trends': { const s = r.signals || {}; html.push(card('Trends', `Level: ${esc(s.level)}`, (s.signals || []).slice(0, 3).map(x => esc(x.signal.replace(/_/g, ' '))).join(' · ') || 'No concerns')); break; }
+      case 'remember': if (r.ok) html.push(card('Remembered', 'Saved for next time', esc(i.content || ''))); break;
+    }
+  }
+  if (!html.length) return null;
+  const d = document.createElement('div'); d.className = 'cards'; d.innerHTML = html.join(''); return d;
+}
+const card = (k, t, s) => `<div class="tc"><div class="k">${esc(k)}</div><div class="t">${t}</div><div class="s">${s}</div></div>`;
+const apptCard = (a, k = 'Appointment') => card(k, esc(a.title), `${fmtDay(a.starts_at)} · ${fmtTime(a.starts_at)}<br>${esc(a.location || '')}${a.needs_ride ? ' · <span class="chip watch">ride needed</span>' : ''}`);
+
+/* ---------- family dashboard ---------- */
+async function loadFamily() {
+  let s; try { s = await api('/api/snapshot'); } catch (e) { return; }
+  const p = s.person;
+  $('#pname').textContent = p.name; $('#av').textContent = p.name[0];
+  $('#pinfo').textContent = `${p.age} · ${p.conditions}`;
+  const lvl = s.signals.level; $('#lvl').className = 'badge ' + lvl; $('#lvl').textContent = lvl === 'ok' ? 'All good' : lvl;
+  $('#lvltext').textContent = lvl === 'ok' ? 'No concerning patterns' : `${s.signals.signals.length} signal${s.signals.signals.length > 1 ? 's' : ''} detected`;
+
+  $('#signals').innerHTML = s.signals.signals.length ? s.signals.signals.map(x => `<div class="sig ${x.severity}"><div class="bar"></div><div><b>${esc(x.signal.replace(/_/g, ' '))}</b><span>${esc(x.detail)}</span></div></div>`).join('') : '<div class="empty">Nothing concerning right now.</div>';
+
+  $('#doses').innerHTML = s.doses_today.map(d => `
+    <div class="dose"><div class="time">${esc(d.slot)}</div>
+    <div class="nm">${esc(d.medication)} <small>${esc(d.dose)} · ${esc(d.purpose)}</small></div>
+    ${['taken','missed','skipped'].includes(d.status) ? `<span class="st ${d.status}">${d.status}</span>` : `<span class="st ${d.status}">${d.status}</span><button class="btn small" data-med="${esc(d.medication)}" data-slot="${esc(d.slot)}">Mark taken</button>`}</div>`).join('');
+  $('#doses').querySelectorAll('button[data-med]').forEach(b => b.onclick = async () => { await api('/api/dose', {medication: b.dataset.med, slot: b.dataset.slot, status: 'taken'}); loadFamily(); });
+
+  $('#alerts').innerHTML = s.open_alerts.length ? s.open_alerts.map(a => `
+    <div class="alert"><div class="h"><span class="badge ${esc(a.severity)}" style="padding:2px 10px;font-size:11px">${esc(a.severity)}</span><b>${esc(a.title)}</b><button class="btn small" data-id="${a.id}">Resolve</button></div>
+    <div style="font-size:14px">${esc(a.detail)}</div><small>${ago(a.ts)} · notified ${esc(a.notified || '')}</small></div>`).join('') : '<div class="empty">No open alerts.</div>';
+  $('#alerts').querySelectorAll('button[data-id]').forEach(b => b.onclick = async () => { await api('/api/alerts/' + b.dataset.id + '/resolve', {}); loadFamily(); });
+
+  $('#appts').innerHTML = s.next_appointments.map(a => { const d = new Date(a.starts_at); return `
+    <div class="appt"><div class="date"><b>${d.getDate()}</b><small>${d.toLocaleDateString([], {month: 'short'})}</small></div>
+    <div><b>${esc(a.title)}</b>${a.needs_ride ? '<span class="ride">ride needed</span>' : ''}<div style="color:var(--muted);font-size:13px">${fmtTime(a.starts_at)} · ${esc(a.doctor || '')} · ${esc(a.location || '')}</div>${a.notes ? `<div style="font-size:13px">${esc(a.notes)}</div>` : ''}</div></div>`; }).join('') || '<div class="empty">Nothing scheduled.</div>';
+  $('#mems').innerHTML = s.memories.map(m => `<div class="mem">${esc(m.content)}</div>`).join('');
+  $('#cg').innerHTML = s.caregivers.map(c => `<div class="mem"><b>${esc(c.name)}</b> · ${esc(c.relation)} <span style="color:var(--muted)">(${esc(c.notify_level)})</span></div>`).join('');
+  drawChart(s.checkins_7d); drawAdh(s.adherence);
+}
+function line(vals, min, max, W, H, color) {
+  if (vals.length < 2) return '';
+  const pts = vals.map((v, i) => [10 + i * (W - 20) / (vals.length - 1), H - 12 - ((v - min) / (max - min)) * (H - 24)]);
+  return `<polyline fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="${pts.map(p => p.join(',')).join(' ')}"/>` + pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="${color}"/>`).join('');
+}
+function drawChart(c) {
+  const grid = [0, 1, 2, 3, 4].map(i => `<line x1="10" x2="630" y1="${12 + i * 46.5}" y2="${12 + i * 46.5}" stroke="currentColor" opacity=".12"/>`).join('');
+  $('#chart').innerHTML = grid + line(c.map(x => x.mood), 1, 5, 640, 210, '#0b6e8f') + line(c.map(x => x.sleep_hours ?? 0), 3, 9, 640, 210, '#8a6fe0') + line(c.map(x => x.pain), 0, 10, 640, 210, '#ff8a5b');
+}
+function drawAdh(a) {
+  const e = Object.entries(a.by_day), w = 300 / Math.max(e.length, 1);
+  $('#adh').innerHTML = e.map(([d, v], i) => `<rect x="${i * w + 6}" y="${190 - v * 1.7}" width="${w - 12}" height="${v * 1.7}" rx="5" fill="${v < 80 ? '#ff8a5b' : '#2e9d6a'}" opacity=".9"/><text x="${i * w + w / 2}" y="206" font-size="10" text-anchor="middle" fill="currentColor" opacity=".6">${new Date(d).toLocaleDateString([], {weekday: 'narrow'})}</text>`).join('');
+  $('#adhsum').innerHTML = `<span>7-day adherence <b style="color:var(--ink)">${a.overall_pct ?? '–'}%</b> · ${a.missed_doses.length} missed</span>`;
+}
+
+/* ---------- agent actions ---------- */
+async function runAgent(btn, path, title) {
+  const old = btn.textContent; btn.disabled = true; btn.textContent = 'Claude is working…';
+  try {
+    const r = await api(path, {});
+    $('#reportcard').style.display = 'block'; $('#reporttitle').textContent = title; $('#report').textContent = r.reply;
+    const c = renderEvents(r.tool_events || []); $('#reportcards').innerHTML = c ? c.innerHTML : '';
+    loadFamily();
+  } catch (e) { $('#reportcard').style.display = 'block'; $('#report').textContent = 'Error: ' + e.message; }
+  btn.disabled = false; btn.textContent = old;
+}
+$('#watch').onclick = e => runAgent(e.target, '/api/care-watch', 'Care watch report');
+$('#digest').onclick = e => runAgent(e.target, '/api/digest', 'Weekly family digest');
+$('#reset').onclick = async () => { if (confirm('Reset all demo data?')) { await api('/api/demo/reset', {}); sessionId = null; $('#feed').innerHTML = ''; $('#reportcard').style.display = 'none'; greet(); loadFamily(); } };
+
+$('#fform').onsubmit = async e => {
+  e.preventDefault(); const t = $('#fin').value.trim(); if (!t) return; $('#fin').value = '';
+  const log = $('#flog'); log.insertAdjacentHTML('beforeend', `<div class="fm u">${esc(t)}</div>`);
+  const w = document.createElement('div'); w.className = 'fm b'; w.textContent = '…'; log.appendChild(w);
+  try { const r = await api('/api/chat', {message: t, session_id: familySession, role: 'family'}); w.textContent = r.reply; loadFamily(); }
+  catch (er) { w.textContent = 'Error: ' + er.message; }
+  log.scrollTop = 1e9;
+};
+
+function greet() { addMsg('bot', 'Hi Asha tai, I am here. You can tell me about your medicines, how you slept, or ask what is on today.'); }
+greet(); loadHealth();
+</script>
+</body>
+</html>
