@@ -107,7 +107,7 @@ Amazon Bedrock (Claude Haiku 4.5), Strands Agents SDK, Model Context Protocol (P
 | 2 | Bedrock access | Claude models need a use-case form before the first call. | A link to the form from the "model access denied" error. |
 | 3 | Strands | The agent silently used a default us-east-1 model when no model was passed; the call failed with a generic AccessDenied from an organisation policy. | A warning when the default model is used. |
 | 4 | MCP Python SDK | `mcp` 2.x removed the `FastMCP` import path; the failure was an import error with no migration hint. | Release note and a deprecation shim. |
-| 5 | Alexa+ toolkit | The CLI sits in a private registry; our account was not allowed to assume the access role. We could not register or test on Alexa+. | Public CLI or a hosted simulator for participants. |
+| 5 | Alexa+ toolkit | The setup guide says the CLI is installed from a private registry, reached by assuming an Amazon-owned role from an AWS account Amazon provisions. We had no such arrangement, so we did not attempt it and could not register or test on Alexa+. | Public CLI or a hosted simulator for participants. |
 | 6 | Alexa+ docs | Account-linking redirect URIs are only revealed by a CLI command, and the identity passed to the server is not described on the pages we read. | One page with a worked end-to-end linking example. |
 
 *(Add how long each took you if you want to quantify it; we did not time them.)*
