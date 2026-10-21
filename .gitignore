@@ -12,3 +12,4 @@ web/playwright-report/
 web/dist/
 *.bak
 web/*.tsbuildinfo
+web/demo/out/
