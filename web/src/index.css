@@ -1,0 +1,54 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/fraunces';
+
+:root {
+  --bg: #f5f2ec; --bg-2: #ece7de; --surface: #ffffff; --surface-2: #faf8f4;
+  --ink: #16202e; --muted: #667085; --line: #e7e1d6;
+  --brand: #0b6e8f; --brand-ink: #ffffff; --alexa: #00b6f0; --warm: #ff8a5b;
+  --ok: #23996a; --info: #4a74d9; --watch: #d29214; --high: #e0592f; --urgent: #c4252f;
+  --ok-soft: #e1f4ea; --info-soft: #e5ecfb; --watch-soft: #fbf0d3; --high-soft: #fde4da; --urgent-soft: #fbd9dc;
+  --shadow: 0 1px 2px rgb(22 32 46 / .05), 0 10px 30px rgb(22 32 46 / .07);
+  --shadow-lg: 0 2px 4px rgb(22 32 46 / .06), 0 24px 60px rgb(22 32 46 / .14);
+}
+[data-theme='dark'] {
+  --bg: #0c1118; --bg-2: #111826; --surface: #151d2b; --surface-2: #1a2434;
+  --ink: #e9eef6; --muted: #93a1b6; --line: #24314a;
+  --brand: #3ab0d4; --brand-ink: #04202b; --alexa: #29c4ff; --warm: #ff9a70;
+  --ok: #46c690; --info: #7ea2ff; --watch: #f0b64a; --high: #ff8660; --urgent: #ff6b75;
+  --ok-soft: #153a2c; --info-soft: #1b2b52; --watch-soft: #3f3418; --high-soft: #46261b; --urgent-soft: #48191f;
+  --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 10px 30px rgb(0 0 0 / .35);
+  --shadow-lg: 0 2px 4px rgb(0 0 0 / .5), 0 24px 60px rgb(0 0 0 / .5);
+}
+
+@theme inline {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Fraunces Variable', Georgia, serif;
+  --color-bg: var(--bg); --color-bg2: var(--bg-2); --color-surface: var(--surface); --color-surface2: var(--surface-2);
+  --color-ink: var(--ink); --color-muted: var(--muted); --color-line: var(--line);
+  --color-brand: var(--brand); --color-alexa: var(--alexa); --color-warm: var(--warm);
+  --color-ok: var(--ok); --color-info: var(--info); --color-watch: var(--watch); --color-high: var(--high); --color-urgent: var(--urgent);
+  --color-ok-soft: var(--ok-soft); --color-info-soft: var(--info-soft); --color-watch-soft: var(--watch-soft);
+  --color-high-soft: var(--high-soft); --color-urgent-soft: var(--urgent-soft);
+}
+
+html, body, #root { min-height: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  background-image: radial-gradient(1000px 520px at 85% -10%, color-mix(in srgb, var(--alexa) 14%, transparent), transparent 70%),
+                    radial-gradient(900px 480px at -5% 0%, color-mix(in srgb, var(--warm) 12%, transparent), transparent 70%);
+  background-attachment: fixed;
+}
+button { font: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 8px; }
+.scroll-thin::-webkit-scrollbar { width: 6px; height: 6px }
+.scroll-thin::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--muted) 35%, transparent); border-radius: 6px }
+.no-scrollbar::-webkit-scrollbar { display: none }
+.no-scrollbar { scrollbar-width: none }
+
+@keyframes shimmer { to { background-position: -200% 0 } }
+.skeleton { background: linear-gradient(100deg, var(--line) 30%, var(--surface-2) 50%, var(--line) 70%); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; border-radius: 12px }
+@keyframes caret { 50% { opacity: 0 } }
+.caret::after { content: ''; display: inline-block; width: 2px; height: 1.05em; margin-left: 2px; vertical-align: -0.15em; background: currentColor; animation: caret 1s steps(1) infinite }
+@media (prefers-reduced-motion: reduce) { *, ::before, ::after { animation-duration: .01ms !important; transition-duration: .01ms !important } }
