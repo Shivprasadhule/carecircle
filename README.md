@@ -7,6 +7,8 @@ Built for the *Build, Ship, Shape: Amazon Developer Hackathon* (Alexa+ track), w
 
 ![license](https://img.shields.io/badge/license-MIT-green)
 
+**Demo video (2 min):** https://youtu.be/lSqGZR3PuUQ
+
 ---
 
 ## What it does
