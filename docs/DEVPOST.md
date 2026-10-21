@@ -1,7 +1,7 @@
 # Devpost submission text (draft)
 
 Track: **Alexa+** (self-hosted MCP server). Mini challenges: **AWS Builder** (Amazon Bedrock) and **Open Source** (MIT).
-Repo: https://github.com/Shivprasadhule/carecircle · Demo video: *(add the YouTube/Vimeo link)*
+Repo: https://github.com/Shivprasadhule/carecircle · Demo video: https://youtu.be/dC9Rw1XbW8Q (unlisted); also attached to the [GitHub release](https://github.com/Shivprasadhule/carecircle/releases/tag/v0.1.0)
 
 ---
 
